@@ -1,0 +1,278 @@
+
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<title>SecureBuzz</title>  <style>  
+body {  
+    font-family: Arial, sans-serif;  
+    margin: 0;  
+    background: #f5f5f5;  
+    text-align: center;  
+}  
+  
+header {  
+    background: linear-gradient(90deg, purple, deeppink);  
+    color: white;  
+    padding: 20px;  
+}  
+  
+nav button {  
+    margin: 10px;  
+    padding: 10px 20px;  
+    border: none;  
+    border-radius: 5px;  
+    cursor: pointer;  
+}  
+  
+section {  
+    display: none;  
+    padding: 20px;  
+}  
+  
+section.active {  
+    display: block;  
+}  
+  
+.box {  
+    background: white;  
+    padding: 15px;  
+    margin: 15px auto;  
+    width: 80%;  
+    border-radius: 8px;  
+}  
+  
+textarea {  
+    width: 80%;  
+    height: 100px;  
+}  
+  
+.sos-btn {  
+    background: red;  
+    color: white;  
+    padding: 15px;  
+    font-size: 18px;  
+    border: none;  
+    border-radius: 8px;  
+    margin: 10px;  
+    width: 90%;  
+    cursor: pointer;  
+}  
+</style>  </head>  
+<script type="module">  
+  // Import the functions you need from the SDKs you need  
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";  
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-analytics.js";  
+  // TODO: Add SDKs for Firebase products that you want to use  
+  // https://firebase.google.com/docs/web/setup#available-libraries  // Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+apiKey: "AIzaSyAcGI405TfP4ZNVNFQYxVFZkYLJMF5ddf0",
+authDomain: "buzz-d67e6.firebaseapp.com",
+projectId: "buzz-d67e6",
+storageBucket: "buzz-d67e6.firebasestorage.app",
+messagingSenderId: "547041091123",
+appId: "1:547041091123:web:d907df7d6cbdb55f4b4d46",
+measurementId: "G-GQBC2RY55E"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+</script>
+
+<body>  <header>  
+<h1>🔐 SecureBuzz</h1>  
+<p>Women Safety & Entertainment Website</p>  
+</header>  <nav>  
+<button onclick="showSection('home')">Home</button>  
+<button onclick="showSection('sos')">SOS</button>  
+<button onclick="showSection('complaint')">Complaint</button>
+<button onclick="showSection('stories')">stories</button>
+<button onclick="showSection('music')">Music</button>  
+</nav>  <!-- HOME -->  <section id="home" class="active">  
+<div class="box">  
+<h2>Welcome to SecureBuzz</h2>  
+<p>Your safety companion 💜</p>  
+</div>  
+</section>  <!-- SOS -->  <section id="sos">  
+<div class="box">  
+<h2>🚨 SOS Emergency</h2>  <button class="sos-btn" onclick="sendSOS()">🚨 SEND SOS ALERT</button>
+
+<button class="sos-btn" onclick="sendEmailSOS()">📧 EMAIL SOS</button>
+
+<button class="sos-btn" onclick="playSiren()">🔊 PLAY SOS SIREN</button>
+
+<p id="sosMsg" style="color:red;font-weight:bold;"></p>  <audio id="siren">  
+<source src="siren.mp3" type="audio/mpeg">  
+</audio>  
+</div>  
+</section>  <!-- COMPLAINT -->  <section id="complaint">  
+<div class="box">  
+<h2>📝 Complaint Box</h2>  <textarea id="complaintText" placeholder="Type your complaint here..."></textarea><br><br>  <button onclick="saveComplaint()">Submit Complaint</button>
+
+<p id="complaintMsg"></p>  
+<h3>📋 Submitted Complaints</h3>  
+<div id="complaintList"></div>  
+</div>  
+</section>  
+<!--Stories-->  
+<section id="stories">
+<div class="box">
+<h2>📖 Stories</h2>
+<input type="file" id="storyFile" accept=".pdf,.doc,.docx" />
+<br><br>
+<button onclick="uploadStory()">Upload Story</button>
+<h3>Submitted Stories</h3>
+<div id="storyList"></div>
+</div>
+</section>
+<!-- MUSIC -->  
+<section id="music">  
+<div class="box">  
+<h2>🎶 Relaxing Music</h2>  <p>Song 1</p>  
+<audio controls>  
+<source src="music2.mp3" type="audio/mpeg">  
+</audio>  <p>Song 2</p>  
+<audio controls>  
+<source src="music3.mp3" type="audio/mpeg">  
+</audio>  
+<p>Song 3</p>  
+<audio controls>  
+<source src="music1.mp3" type="audio/mpeg">  
+</audio>  </div>  
+</section>  <script>  
+      
+function saveComplaint() {  
+    let text = document.getElementById("complaintText").value;  
+    if (text === "") {  
+        alert("Please write a complaint");  
+        return;  
+    }  
+  
+    let complaints = JSON.parse(localStorage.getItem("complaints")) || [];  
+  
+    complaints.push({  
+        message: text,  
+        time: new Date().toLocaleString()  
+    });  
+  
+    localStorage.setItem("complaints", JSON.stringify(complaints));  
+  
+    document.getElementById("complaintMsg").innerText =  
+        "✅ Complaint saved successfully";  
+  
+    document.getElementById("complaintText").value = "";  
+  
+    loadComplaints();  
+}  
+  
+function loadComplaints() {  
+    let complaints = JSON.parse(localStorage.getItem("complaints")) || [];  
+    let list = document.getElementById("complaintList");  
+  
+    list.innerHTML = "";  
+  
+    complaints.forEach((c, index) => {  
+        let li = document.createElement("li");  
+        li.innerText = (index + 1) + ". " + c.message + " (" + c.time + ")";  
+        list.appendChild(li);  
+    });  
+}  
+  
+// Load complaints when page opens  
+loadComplaints();  
+  
+function showSection(id) {  
+    let sections = document.querySelectorAll("section");  
+    sections.forEach(sec => sec.classList.remove("active"));  
+    document.getElementById(id).classList.add("active");  
+    if(id=="complaint") {  
+        loadComplaints();  
+    }  
+}  
+  
+  
+function saveComplaint() {  
+    let text = document.getElementById("complaintText").value;  
+    if (text === "") {  
+        alert("Please write a complaint");  
+        return;  
+    }  
+  
+    let complaints = JSON.parse(localStorage.getItem("complaints")) || [];  
+  
+    complaints.push({  
+        message: text,  
+        time: new Date().toLocaleString()  
+    });  
+  
+    localStorage.setItem("complaints", JSON.stringify(complaints));  
+  
+    document.getElementById("complaintMsg").innerText =  
+        "✅ Complaint saved successfully";  
+  
+    document.getElementById("complaintText").value = "";  
+  
+    loadComplaints();  
+}  
+  
+function displayComplaints() {  
+    let complaints = JSON.parse(localStorage.getItem("complaints")) || [];  
+    let list = document.getElementById("complaintList");  
+  
+    list.innerHTML = "";  
+  
+    complaints.forEach((c, index) => {  
+        let li = document.createElement("li");  
+        li.innerText = (index + 1) + ". " + c.message + " (" + c.time + ")";  
+        list.appendChild(li);  
+    });  
+}  
+  
+// Load complaints when page opens  
+displayComplaints();  
+function sendSOS() {  
+    document.getElementById("sosMsg").innerText =  
+        "🚨 EMERGENCY! Please call this number immediately: 8522821648";  
+    alert("🚨 SOS Activated! Ask nearby people for help.");  
+}  
+  
+  
+  
+function sendEmailSOS() {  
+    window.location.href =  
+      "mailto:Reddysharanya33@gmail.com?subject=Emergency SOS&body=I need help immediately!";  
+}  
+  
+  
+function playSiren() {  
+    document.getElementById("siren").play();  
+}  
+function displayComplaints() {  
+    let list = document.getElementById("complaintList");  
+    list.innerHTML = "";  
+  
+    let complaints = JSON.parse(localStorage.getItem("complaints")) || [];  
+  
+    if (complaints.length === 0) {  
+        list.innerHTML = "<p>No complaints yet.</p>";  
+        return;  
+    }  
+  
+    complaints.forEach((item, index) => {  
+        let div = document.createElement("div");  
+        div.style.border = "1px solid #ccc";  
+        div.style.padding = "8px";  
+        div.style.margin = "8px";  
+        div.style.borderRadius = "5px";  
+  
+        div.innerHTML = `  
+          <strong>Complaint ${index + 1}</strong><br>  
+          ${item.message}<br>  
+          <small>🕒 ${item.time}</small>  
+        `;  
+        list.appendChild(div);  
+    });  
+}  
+</script>  </body>  
+</html>

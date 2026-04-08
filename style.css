@@ -1,0 +1,35 @@
+body {
+  font-family: Arial;
+  background: #f2f2f2;
+  text-align: center;
+}
+
+header {
+  background: purple;
+  color: white;
+  padding: 15px;
+}
+
+nav button {
+  margin: 5px;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.box {
+  background: white;
+  margin: 20px;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.sos-btn {
+  background: red;
+  color: white;
+  padding: 15px;
+  font-size: 20px;
+}
